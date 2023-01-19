@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<data
+	name="http://www.3s-software.com/plcopenxml/globalvars"
+	handleUnknown="implementation">
+	<globalVars
+		name="template_name">
+		<documentation>
+			<xhtml
+				xmlns="http://www.w3.org/1999/xhtml" />
+		</documentation>
+		<addData>
+			<data
+				name="http://www.3s-software.com/plcopenxml/attributes"
+				handleUnknown="implementation">
+				<Attributes>					
+				</Attributes>
+			</data>
+			<data
+				name="http://www.3s-software.com/plcopenxml/objectid"
+				handleUnknown="discard">
+				<ObjectId>aee2fe06-f677-434c-8c3d-69670ehui001</ObjectId>
+			</data>
+		</addData>
+	</globalVars>
+</data>
+<data
+	name="http://www.3s-software.com/plcopenxml/projectstructure"
+	handleUnknown="discard">
+	<ProjectStructure>
+		<Object
+			Name="template_name"
+			ObjectId="aee2fe06-f677-434c-8c3d-69670ehui001" />
+	</ProjectStructure>
+</data>

@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SettingsDialog</class>
+ <widget class="QDialog" name="SettingsDialog">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>585</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>480</width>
+    <height>585</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>480</width>
+    <height>585</height>
+   </size>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::NoContextMenu</enum>
+  </property>
+  <property name="windowTitle">
+   <string>Настройки приложения</string>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <widget class="QGroupBox" name="gb_Common">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>461</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Общие настройки</string>
+   </property>
+   <widget class="QLabel" name="label_activeTab">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>251</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Активная вкладка при запуске приложения</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbox_activeTab">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>30</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="statusTip">
+     <string>Выбор ПЛК</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>140</y>
+     <width>481</width>
+     <height>401</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QTabBar::tab 
+{
+	height: 30;
+	width: 90;
+}
+</string>
+   </property>
+   <property name="tabPosition">
+    <enum>QTabWidget::North</enum>
+   </property>
+   <property name="tabShape">
+    <enum>QTabWidget::Rounded</enum>
+   </property>
+   <property name="currentIndex">
+    <number>4</number>
+   </property>
+   <property name="documentMode">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="t0_regul">
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="whatsThis">
+     <string/>
+    </property>
+    <attribute name="title">
+     <string>Regul</string>
+    </attribute>
+    <attribute name="toolTip">
+     <string>Генерация ПО для ПЛК Regul</string>
+    </attribute>
+    <widget class="QLabel" name="label_regulPLC">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>141</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ПЛК по умолчанию</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="cbox_regulPLC">
+     <property name="geometry">
+      <rect>
+       <x>289</x>
+       <y>10</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="statusTip">
+      <string>Выбор ПЛК</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_iec104_time">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>100</y>
+       <width>251</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Время блокировки команд IEC104s (сек)</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_iec104_timeEDC">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>132</y>
+       <width>251</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Время блокировки команд IEC104s EDC (сек)</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="edit_iec104_time">
+     <property name="geometry">
+      <rect>
+       <x>289</x>
+       <y>100</y>
+       <width>113</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="edit_iec104_timeEDC">
+     <property name="geometry">
+      <rect>
+       <x>289</x>
+       <y>130</y>
+       <width>113</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="edit_ModbusVersion">
+     <property name="geometry">
+      <rect>
+       <x>290</x>
+       <y>160</y>
+       <width>113</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_ModbusVersion">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>160</y>
+       <width>201</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Версия устройств Modbus</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbx_uniteMemory">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>190</y>
+       <width>311</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Единая область памяти Modbus TCP</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbx_OSTemplated">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>220</y>
+       <width>311</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Преобразовывать шаблоны к OS версии</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbx_AutoTime">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>250</y>
+       <width>311</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Автоприсвоение метки времени IEC 104s (Autotime)</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbx_AutoTimeEDC">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>280</y>
+       <width>351</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Автоприсвоение метки времени IEC 104s_EDC (Autotime)</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbx_RegulBus_OS">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>311</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Использовать RegulBus OS</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbx_Iec104s_OS">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>311</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Использовать Iec104s OS</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="t1_mk">
+    <property name="statusTip">
+     <string/>
+    </property>
+    <attribute name="title">
+     <string>MKLogic</string>
+    </attribute>
+    <attribute name="toolTip">
+     <string>Генерация ПО для ПЛК MKLogic</string>
+    </attribute>
+    <widget class="QLineEdit" name="lineEdit_isagraf_maxlines">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>38</y>
+       <width>131</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="chb_isagrafSplitLargeFiles">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>181</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Разделять большие файлы</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_MaxLines">
+     <property name="geometry">
+      <rect>
+       <x>22</x>
+       <y>40</y>
+       <width>211</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Максимальное кол-во строк</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="t2_dev">
+    <attribute name="title">
+     <string>Alpha</string>
+    </attribute>
+    <attribute name="toolTip">
+     <string>Генерация карт адресов для DevStudio и др.</string>
+    </attribute>
+    <widget class="QCheckBox" name="chb_IEC870_csv">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>311</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Карта адресов IEC 870-50</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="chb_Modbus_csv">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>311</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Карта адресов Modbus</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="t3_io">
+    <attribute name="title">
+     <string>Инф. обесп.</string>
+    </attribute>
+    <attribute name="toolTip">
+     <string>Генерация Инф. обеспечения</string>
+    </attribute>
+    <widget class="QComboBox" name="cbox_IO_parse">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>10</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string/>
+     </property>
+     <property name="statusTip">
+      <string>Выбор ПЛК</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_IO_parse">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>191</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Адреса брать из свойств</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbx_IO_rezerv">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>311</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Не включать строчки &quot;Резерв&quot;</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbx_IO_empty">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>311</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Не включать Пустые строчки</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbx_IO_highlight">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>100</y>
+       <width>311</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Подсвечивать наложения</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Другое</string>
+    </attribute>
+   </widget>
+  </widget>
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>540</y>
+     <width>451</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+   <property name="centerButtons">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>121</y>
+     <width>161</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Настройки по умолчанию</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

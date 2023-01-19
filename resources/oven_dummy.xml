@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+      <configuration name="oven_dummy">
+        <addData>
+          <data name="Device" handleUnknown="discard">
+            <Device xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="">
+              <DeviceType>
+                <DeviceIdentification>
+                  <Type>40096</Type>
+                  <Id>109B 0001</Id>
+                  <Version>1.6.5.1</Version>
+                </DeviceIdentification>
+                <Connector moduleType="40096" role="child" interface="Common.ModbusSerialMaster" connectorId="1">
+                  <HostParameterSet>
+                    <ParameterSection>
+                      <Name>ch1</Name>
+                      <Description>ReadHoldingRegisters : </Description>
+                      <Parameter ParameterId="20001" type="std:WORD">
+                        <Attributes channel="input" />
+                        <Value name="_x0032_0001" visiblename="Data" desc="16#0000 (00000) : " />
+                        <Name>Data</Name>
+                        <Description>16#0000 (00000) : </Description>
+                      </Parameter>
+                      <Parameter ParameterId="20002" type="std:BYTE">
+                        <Attributes channel="input" />
+                        <Value name="_x0032_0002" visiblename="Status" />
+                        <Name>Status</Name>
+                      </Parameter>
+                    </ParameterSection>
+                    <Parameter ParameterId="6000" type="std:DWORD" IndexInDevDesc="0">
+                      <Attributes offlineaccess="read" onlineaccess="read" />
+                      <Value name="_x0036_000" visiblename="Instance identify" offlineaccess="read" onlineaccess="read">0</Value>
+                      <Name>Instance identify</Name>
+                    </Parameter>
+                    <Parameter ParameterId="6001" type="std:STRING" IndexInDevDesc="1">
+                      <Attributes onlineaccess="read" />
+                      <Value name="_x0036_001" visiblename="Имя экземпляра" onlineaccess="read">'oven_dummy'</Value>
+                      <Name>Имя экземпляра</Name>
+                    </Parameter>
+                    <Parameter ParameterId="8000" type="std:BOOL" IndexInDevDesc="2">
+                      <Attributes onlineaccess="read" />
+                      <Value name="_x0038_000" visiblename="Отладочный режим" onlineaccess="read">False</Value>
+                      <Name>Отладочный режим</Name>
+                    </Parameter>
+                    <Parameter ParameterId="9000" type="localTypes:TypeSlaveUid" IndexInDevDesc="3">
+                      <Attributes onlineaccess="read" />
+                      <Value name="_x0039_000" visiblename="Адрес ведомого устройства" onlineaccess="read">247</Value>
+                      <Name>Адрес ведомого устройства</Name>
+                    </Parameter>
+                    <Parameter ParameterId="9001" type="std:UDINT" IndexInDevDesc="4">
+                      <Attributes onlineaccess="read" />
+                      <Value name="_x0039_001" visiblename="Таймаут ответа (мс)" onlineaccess="read">500</Value>
+                      <Name>Таймаут ответа (мс)</Name>
+                    </Parameter>
+                    <Parameter ParameterId="9002" type="localTypes:StopBehavior" IndexInDevDesc="5">
+                      <Attributes onlineaccess="read" />
+                      <Value name="_x0039_002" visiblename="Поведение в режиме СТОП" onlineaccess="read">0</Value>
+                      <Name>Поведение в режиме СТОП</Name>
+                    </Parameter>
+                    <Parameter ParameterId="9006" type="std:UDINT" IndexInDevDesc="6">
+                      <Attributes offlineaccess="read" onlineaccess="read" />
+                      <Value name="_x0039_006" visiblename="Starting ParameterId of channel" offlineaccess="read" onlineaccess="read">20000</Value>
+                      <Name>Starting ParameterId of channel</Name>
+                    </Parameter>
+                    <Parameter ParameterId="12000" type="std:UDINT" IndexInDevDesc="7">
+                      <Attributes offlineaccess="read" onlineaccess="read" />
+                      <Value name="_x0031_2000" visiblename="Максимальное кол-во каналов" offlineaccess="read" onlineaccess="read">16#40000</Value>
+                      <Name>Максимальное кол-во каналов</Name>
+                    </Parameter>
+                    <Parameter ParameterId="12001" type="std:DWORD" IndexInDevDesc="8">
+                      <Attributes onlineaccess="read" />
+                      <Value name="_x0031_2001" visiblename="Максимальный используемый id" onlineaccess="read">20000</Value>
+                      <Name>Максимальный используемый id</Name>
+                    </Parameter>
+                    <Parameter ParameterId="12002" type="localTypes:SerialMode" IndexInDevDesc="9">
+                      <Attributes onlineaccess="read" />
+                      <Value name="_x0031_2002" visiblename="Режим передачи" onlineaccess="read">1</Value>
+                      <Name>Режим передачи</Name>
+                    </Parameter>
+                    <Parameter ParameterId="15000" type="std:BOOL" IndexInDevDesc="10">
+                      <Attributes channel="input" />
+                      <Value name="_x0031_5000" visiblename="Соединение" desc="Качество соединения">0</Value>
+                      <Name>Соединение</Name>
+                      <Description>Качество соединения</Description>
+                    </Parameter>
+                    <Parameter ParameterId="20000" type="localTypes:Channel">
+                      <Attributes />
+                      <Value name="_x0032_0000" visiblename="Канал 1">
+                        <Element name="ChType" visiblename="Тип канала">0</Element>
+                        <Element name="CycleTime" visiblename="Интервал опроса">100</Element>
+                        <Element name="FunctionCode" visiblename="Код функции">3</Element>
+                        <Element name="Offset" visiblename="Смещение">0</Element>
+                        <Element name="Length" visiblename="Длина">1</Element>
+                        <Element name="ChannelName" visiblename="Имя">'ch1'</Element>
+                        <Element name="ChannelComment" visiblename="Комментарий">''</Element>
+                      </Value>
+                      <Name>Канал 1</Name>
+                    </Parameter>
+                  </HostParameterSet>
+                </Connector>
+                <DeviceParameterSet />
+              </DeviceType>
+            </Device>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>ac580c9b-801a-452c-b9e5-8f96ac9a1c4e</ObjectId>
+          </data>
+        </addData>
+      </configuration>

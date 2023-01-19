@@ -1,0 +1,974 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>480</width>
+    <height>750</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>480</width>
+    <height>750</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>480</width>
+    <height>750</height>
+   </size>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>450</width>
+    <height>650</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>ИТР Конфигуратор</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../resources/resources.qrc">
+    <normaloff>:/icon.ico</normaloff>:/icon.ico</iconset>
+  </property>
+  <property name="documentMode">
+   <bool>false</bool>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
+  <property name="dockNestingEnabled">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>481</width>
+      <height>701</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QTabBar::tab 
+{
+	height: 30;
+	width: 90;
+}
+</string>
+    </property>
+    <property name="tabPosition">
+     <enum>QTabWidget::North</enum>
+    </property>
+    <property name="tabShape">
+     <enum>QTabWidget::Rounded</enum>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <property name="documentMode">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="t0_regul">
+     <property name="statusTip">
+      <string/>
+     </property>
+     <property name="whatsThis">
+      <string/>
+     </property>
+     <attribute name="title">
+      <string>Regul</string>
+     </attribute>
+     <attribute name="toolTip">
+      <string>Генерация ПО для ПЛК Regul</string>
+     </attribute>
+     <widget class="QGroupBox" name="RegulAppGroup">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>461</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Преобразование xml файлов ПО</string>
+      </property>
+      <widget class="QComboBox" name="cbox_regulPLC">
+       <property name="geometry">
+        <rect>
+         <x>243</x>
+         <y>50</y>
+         <width>111</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="statusTip">
+        <string>Выбор ПЛК</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_regulPLC">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>30</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Выбор ПЛК</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_regulLoadXML">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>100</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Загрузить ЭЛСИ-ТМК.xml и ЭЛСИ-ТМК_Application.xml</string>
+       </property>
+       <property name="text">
+        <string>Загрузить xml</string>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_OS">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>131</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Версия устройств</string>
+       </property>
+       <widget class="QCheckBox" name="chb_RegulBus_OS">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>101</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="statusTip">
+         <string>Влияет на обращение к модулям DI/DO</string>
+        </property>
+        <property name="text">
+         <string>RegulBus OS</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="chb_iec104s_OS">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>55</y>
+          <width>101</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="statusTip">
+         <string>Влияет только на мс/с во времени выборки. ОС - мс, не ОС - сек</string>
+        </property>
+        <property name="text">
+         <string>Iec104Slave OS</string>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="RegulModbusGroup">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>180</y>
+        <width>461</width>
+        <height>211</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Генерация Modbus устройств из csv</string>
+      </property>
+      <widget class="QPushButton" name="btn_TemplatesPath">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>20</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Выбор папки в которой хранятся шаблоны</string>
+       </property>
+       <property name="text">
+        <string>Выбрать папку
+ с шаблонами</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_TemplatesTotal">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>151</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Доступно шаблонов: 0</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_TemplatesPath">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>50</y>
+         <width>41</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Путь</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_TemplateGen">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>160</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Загрузка всех csv для парсинга шаблонов</string>
+       </property>
+       <property name="text">
+        <string>Загрузить csv</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="ledit_TemplatesPath">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>361</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>-</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_TemplatesVersion">
+       <property name="geometry">
+        <rect>
+         <x>11</x>
+         <y>100</y>
+         <width>111</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Версия устройств</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="ledit_TemplatesVersion">
+       <property name="geometry">
+        <rect>
+         <x>123</x>
+         <y>100</y>
+         <width>111</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Изменение версии modbus устройств</string>
+       </property>
+       <property name="text">
+        <string>1.6.5.1</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkb_TemlatesOS">
+       <property name="geometry">
+        <rect>
+         <x>11</x>
+         <y>130</y>
+         <width>241</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Выходные шаблоны будут версии OS, иначе не OS</string>
+       </property>
+       <property name="text">
+        <string>Преобразовать шаблоны к OS версии</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="SokolMBS_Group">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>400</y>
+        <width>461</width>
+        <height>80</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Генерация Modbus устройств по .xlsx таблице (name, ip, template)</string>
+      </property>
+      <widget class="QPushButton" name="pb_openExellTable_withTemplates">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>30</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Рядом с таблицей должна быть папка templates с .xml шаблонами (Сокол)</string>
+       </property>
+       <property name="text">
+        <string>Открыть таблицу .xlsx</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="t1_mk">
+     <property name="statusTip">
+      <string/>
+     </property>
+     <attribute name="title">
+      <string>MKLogic</string>
+     </attribute>
+     <attribute name="toolTip">
+      <string>Генерация ПО для ПЛК MKLogic</string>
+     </attribute>
+     <widget class="QGroupBox" name="MKGroupBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>461</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Преобразование xml файлов ПО</string>
+      </property>
+      <widget class="QPushButton" name="btn_isagrafLoadXML">
+       <property name="geometry">
+        <rect>
+         <x>300</x>
+         <y>60</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Загрузить ЭЛСИ-ТМК_Application.xml</string>
+       </property>
+       <property name="text">
+        <string>Загрузить xml</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chb_isagrafSplitLargeFiles">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>181</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Разделять большие файлы</string>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_LargeFiles">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>60</y>
+         <width>171</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Максимально строк</string>
+       </property>
+       <widget class="QLineEdit" name="lineEdit_isagraf_maxlines">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>131</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="t2_dev">
+     <attribute name="title">
+      <string>Alpha</string>
+     </attribute>
+     <attribute name="toolTip">
+      <string>Генерация карт адресов для DevStudio и др</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupBox_Dev1">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>461</width>
+        <height>111</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Генерация карт адресов для DevStudio из .csv</string>
+      </property>
+      <widget class="QCheckBox" name="chb_IEC870_csv">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>33</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Карта адресов IEC 870-50</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chb_Modbus_csv">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>63</y>
+         <width>151</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Карта адресов Modbus</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pb_loadCsv_dev">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>40</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Загрузить csv</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_Dev2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>130</y>
+        <width>461</width>
+        <height>80</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Генерация Modbus карты из карт уставок (только для Депо Сокол)</string>
+      </property>
+      <widget class="QPushButton" name="pb_loadXml_dev_Sokol">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>30</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Загрузить xml</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_Dev3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>220</y>
+        <width>461</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Alpha.HMI</string>
+      </property>
+      <widget class="QPushButton" name="pb_HMI_RemoveWaterMark">
+       <property name="geometry">
+        <rect>
+         <x>9</x>
+         <y>35</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="statusTip">
+        <string>Выбрать alpha.hmi.ui.dll (win) или libalpha.hmi.ui.so (linux)</string>
+       </property>
+       <property name="text">
+        <string>Пропатчить
+на водяной знак</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pb_HMI_genUpdateAlarmFun">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>35</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="statusTip">
+        <string>Выбрать файл настроек SETTINGS.xml из папки support HMI проекта</string>
+       </property>
+       <property name="text">
+        <string>Сгенерить функцию
+updateAlarm()</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pb_HMI_genFunctionTable">
+       <property name="geometry">
+        <rect>
+         <x>311</x>
+         <y>35</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="statusTip">
+        <string>Выбрать файл настроек SETTINGS.xml из папки support HMI проекта</string>
+       </property>
+       <property name="text">
+        <string>Получить таблицу
+функций</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="t3_io">
+     <attribute name="title">
+      <string>Инф. обесп.</string>
+     </attribute>
+     <attribute name="toolTip">
+      <string>Генерация Инф. обеспечения</string>
+     </attribute>
+     <widget class="QPushButton" name="pb_IO_load">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>40</y>
+        <width>181</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
+      <property name="statusTip">
+       <string>Открыть окно выбора csv файлов</string>
+      </property>
+      <property name="text">
+       <string>Загрузить csv файл(ы)</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_In">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>171</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Парсинг адресных свойств</string>
+      </property>
+      <widget class="QRadioButton" name="rb_IO_Native">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="statusTip">
+        <string>Свойство 7050, атрибуты ProtocolType, Address, Station</string>
+       </property>
+       <property name="text">
+        <string>Брать из свойства 7050</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="rb_IO_Complex">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>151</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="statusTip">
+        <string>Свойста IEC address (5564), IEC address type (5565), IEC address station (5567)</string>
+       </property>
+       <property name="text">
+        <string>Брать из св-в 5564-5567</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_Out">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>420</y>
+        <width>191</width>
+        <height>141</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Настройки генерации ИО</string>
+      </property>
+      <widget class="QCheckBox" name="chb_IO_Rezerv">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>151</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="statusTip">
+        <string>Не включать в генерацию ИО строчки, которые оканчиваются на &quot; Резерв&quot;</string>
+       </property>
+       <property name="text">
+        <string>Не включать &quot; Резерв&quot;</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chb_IO_Empty">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>141</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="statusTip">
+        <string>Не включать в генерацию ИО строчки с пустым описанием</string>
+       </property>
+       <property name="text">
+        <string>Не включать Пустые</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chb_IO_Highlight">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>181</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="statusTip">
+        <string>Подсветить желтым строку , если адрес не является уникальным</string>
+       </property>
+       <property name="text">
+        <string>Подсвечивать наложения</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="pb_IO_gen">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>470</y>
+        <width>181</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
+      <property name="statusTip">
+       <string>Генерация xlsx файла с ИО</string>
+      </property>
+      <property name="text">
+       <string>Сгенерировать ИО</string>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="tableWidget_IO">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>130</y>
+        <width>461</width>
+        <height>261</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::NoSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="rowCount">
+       <number>0</number>
+      </property>
+      <property name="columnCount">
+       <number>5</number>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>100</number>
+      </attribute>
+      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <column/>
+      <column/>
+      <column/>
+      <column/>
+      <column/>
+     </widget>
+     <widget class="QPushButton" name="pb_IO_gen_txt">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>540</y>
+        <width>181</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <stylestrategy>PreferDefault</stylestrategy>
+       </font>
+      </property>
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
+      <property name="statusTip">
+       <string>Генерация txt файла с описанием сигналов</string>
+      </property>
+      <property name="text">
+       <string>Создать txt файл описаний
+ для МЭК вьюшки</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="t4_other">
+     <attribute name="title">
+      <string>Другое</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>461</width>
+        <height>80</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>ЭЛСИ-ТМК</string>
+      </property>
+      <widget class="QPushButton" name="pb_Other_DenyRequest">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>20</y>
+         <width>191</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Принудительно ставим deny_request флаги в крейте</string>
+       </property>
+       <property name="text">
+        <string>Проставить DenyRequest флаги</string>
+       </property>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>480</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_settings">
+    <property name="title">
+     <string>Настройки</string>
+    </property>
+    <addaction name="action_settings"/>
+   </widget>
+   <widget class="QMenu" name="menu_about">
+    <property name="title">
+     <string>Справка</string>
+    </property>
+    <addaction name="action_about"/>
+   </widget>
+   <addaction name="menu_settings"/>
+   <addaction name="menu_about"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <action name="action_settings">
+   <property name="text">
+    <string>Настройки приложения</string>
+   </property>
+  </action>
+  <action name="action_about">
+   <property name="text">
+    <string>О приложении</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
