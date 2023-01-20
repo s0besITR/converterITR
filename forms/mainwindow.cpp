@@ -1032,7 +1032,7 @@ void MainWindow::on_btn_isagrafLoadXML_clicked()
     for(QString & filename : file_list)
     {
         // Создаем папку для сохранения файлов
-        QDir dir(folder + "\\" + QFileInfo(file_list.at(0)).fileName().replace(".xml",""));
+        QDir dir(folder + "\\" + QFileInfo(filename).fileName().replace(".xml",""));
         if (!dir.exists())
             dir.mkpath(".");
 
