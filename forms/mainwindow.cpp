@@ -999,7 +999,7 @@ void MainWindow::on_pb_IO_gen_txt_clicked()
     QFile file(filename);
     if (file.open(QIODevice::ReadWrite)) {
         QTextStream stream(&file);
-
+        stream.setCodec("UTF-8");
         for(auto & key : IO_info_map.keys())
             for(int k = 0; k != IO_info_map[key].count(); ++k)
             {
