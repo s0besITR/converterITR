@@ -436,7 +436,7 @@ void MainWindow::saveModbusTemplates(QVector<template_modbus> & result_templates
     for(auto & templ : result_templates)
     {
         QDir dir_rtu(folder + "/" + templ.csv_name + QString("/modules"));
-        QDir dir_tcp(folder + "/TCP_DEVICES");
+        QDir dir_tcp(folder + "/" + templ.csv_name + QString("/modules_tcp"));
         if(dir_rtu.exists())        dir_rtu.removeRecursively();
         if(dir_tcp.exists())        dir_tcp.removeRecursively();
     }
@@ -473,7 +473,7 @@ void MainWindow::saveModbusTemplates(QVector<template_modbus> & result_templates
         // Сохраняем
         QString dir_path;
         if(templ.type == 1)
-            dir_path = folder + "/TCP_DEVICES";                  // сохраняем шаблон tcp в отдельную папку
+            dir_path = folder + "/" + templ.csv_name + QString("/modules_tcp");      // сохраняем шаблон tcp в отдельную папку
         else
             dir_path = folder + "/" + templ.csv_name + QString("/modules/Модуль %1/Канал %2").arg(templ.modbus_module).arg(templ.modbus_channel);
         QDir dir(dir_path);
