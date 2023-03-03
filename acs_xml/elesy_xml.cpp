@@ -313,6 +313,7 @@ void Elesy_XML::modifyApplication()
         case 0 :  add_Redundancy(); break;
         case 1 :  add_Redundancy_OS(); break;
         case 2 :  add_Redundancy_RT(); break;
+        case 3 :  break;
     }   
 
     // Если есть каналы Modbus, то создаем MBS_GVL
@@ -474,6 +475,9 @@ void Elesy_XML::cutVarsFromFB_toField()
         }
     }
 
+    if(!field_node)
+        return;
+
     QByteArray fb_vars;
     // Проходимся по всем и останавливаемся только на FB
     for(pugi::xml_node & p_node : xnode.node().children("pou"))
@@ -559,7 +563,7 @@ int Elesy_XML::getRedundancyType()
 {
     pugi::xpath_node  xnode = this->app_doc.select_node("/project/types/pous");
     if(!xnode)
-        return 0;
+        return 3;
 
     //Для каждого pou
     for(pugi::xml_node & p_node : xnode.node().children("pou"))
@@ -585,7 +589,7 @@ int Elesy_XML::getRedundancyType()
                 }
             }
     }
-    return 0;
+    return 3;       // no redundancy
 }
 
 void Elesy_XML::addRedundancyFB_toSharedGVL(pugi::xml_node var)
