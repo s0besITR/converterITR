@@ -74,4 +74,8 @@ private:
     void updateRecentPath(QStringList files);
     QVector<template_modbus> parseModbusTemplates(QStringList file_list);
     void saveModbusTemplates(QVector<template_modbus> & result_templates, QString folder);   
+
+    //Водяной знак
+    int removeWaterMark(QByteArray & content, QByteArray & mark);
+    QByteArray utf8str_to_utf16QByteArray(QString utf8_s);
 };

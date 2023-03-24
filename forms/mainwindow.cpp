@@ -605,6 +605,39 @@ void MainWindow::on_pb_loadXml_dev_Sokol_clicked()
     QMessageBox::information(nullptr,"Информация","Готово!                ", QMessageBox::Ok);
 }
 
+// Конвертируем строку utf8 в utf16 а потом все это в QbyteArray (меняем порядок байт BE в LE)
+QByteArray MainWindow::utf8str_to_utf16QByteArray(QString utf8_s)
+{
+   QString utf16_s = QString::fromUtf16(utf8_s.toStdU16String().c_str());
+   QByteArray bytes_be = QByteArray::fromRawData(reinterpret_cast<const char*>(utf16_s.constData()), utf16_s.size()*2);
+   QByteArray bytes_le;
+   for(int i = 0; i <= bytes_be.length() - 2; i = i + 2)
+   {
+       bytes_le.append(bytes_be[i + 1]);
+       bytes_le.append(bytes_be[i + 0]);
+   }
+
+   return bytes_le;
+}
+
+// Удаляем один водяной знак
+int MainWindow::removeWaterMark(QByteArray & content, QByteArray & mark)
+{
+    int count = 0;
+    for(int i = 0, buf_pos = 0; i != content.length(); ++i)
+    {
+        buf_pos = (mark.at(buf_pos) == content.at(i)) ? buf_pos + 1 : 0;
+        if(buf_pos == mark.length())
+        {
+           for(int j = 0; j <= buf_pos; ++j)
+               content[i-j] = ' ';
+           buf_pos = 0;
+           count++;
+        }
+    }
+    return count;
+}
+
 // Кнопка Пропатчить на водяной знак
 void MainWindow::on_pb_HMI_RemoveWaterMark_clicked()
 {
@@ -615,8 +648,11 @@ void MainWindow::on_pb_HMI_RemoveWaterMark_clicked()
 
     QByteArrayList marks = {"Лицензия не обнаружена или ограничена.",
                            "Использование %1 без лицензии допустимо только для разработки и испытания проектов автоматизации инжиниринговыми компаниями.",
+                           "Использование Alpha.HMI без лицензии допустимо только для разработки и испытания проектов автоматизации инжиниринговыми компаниями.",
                            "Не допускается использование нелицензированных компонентов конечными пользователями на объектах.",
-                           "Все права защищены © %1"};
+                           "Все права защищены © %1",
+                           "Все права защищены © АО \"Атомик Софт\""};
+
     QByteArray content;
     int count = 0;
     QFile file(file_name);
@@ -626,18 +662,14 @@ void MainWindow::on_pb_HMI_RemoveWaterMark_clicked()
         return;
     }
     content = file.readAll();
-    for(QByteArray& mark : marks)
-        for(int i = 0, buf_pos = 0; i != content.length(); ++i)
-        {
-            buf_pos = (mark.at(buf_pos) == content.at(i)) ? buf_pos + 1 : 0;
-            if(buf_pos == mark.length())
-            {
-               for(int j = 0; j <= buf_pos; ++j)
-                   content[i-j] = ' ';
-               buf_pos = 0;
-               count++;
-            }
-        }
+
+    for(QByteArray &mark : marks)
+    {
+        count += removeWaterMark(content, mark);
+        QByteArray utf16_mark = utf8str_to_utf16QByteArray(mark);       // Добавилось для HMI 1.5 где водяные знаки закодированы в UTF-16 вместо UTF-8
+        count += removeWaterMark(content, utf16_mark);
+    }
+
     if(count > 0)
     {
         file.resize(0);
