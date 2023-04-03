@@ -2,7 +2,7 @@
 #include <QFile>
 #include <QDateTime>
 #include <QTextStream>
-
+#include <qDebug>
 
 hmi_actions::hmi_actions(){}
 hmi_type::hmi_type(QString name) : name(name) {}
@@ -220,4 +220,241 @@ QString hmi_settings::to_string()
     out << Qt::endl << "return JSON.stringify([]);";
 
     return content;
+}
+
+
+/* ГЕНЕРАЦИЯ HMI ОБЪЕКТОВ */
+
+hmi_objects::hmi_objects(QString s)
+{
+    QStringList l = s.split(",");
+    if(l.size() != 4)
+         return;
+
+    this->type = l.at(0);
+    this->name = l.at(1);
+    this->tag = l.at(2);
+
+    // Расположение
+    QString loc = l.at(3);
+
+    if(loc.contains("(") && loc.contains(")"))
+    {
+        int start_pos = loc.indexOf("(");
+        int end_pos = loc.indexOf(")");
+        this->location = loc.mid(0, start_pos);
+        this->room = loc.mid(start_pos + 1, end_pos - start_pos - 1);
+    }
+    else
+    {
+        this->location = loc;
+        this->room = "SOME_ROOM";
+    }
+    valid = true;
+}
+
+void load_obj_map(QString & path, QMap<QString,QVector<hmi_objects>> & obj_map)
+{
+    QFile file(path);
+    QVector<hmi_objects> obj_vector;
+    bool has_room_number = false;
+
+    if (file.open(QIODevice::ReadOnly))
+    {
+       QTextStream in(&file);
+       while (!in.atEnd())
+       {
+           hmi_objects tmp(in.readLine());
+           if(tmp.valid)
+           {
+                obj_vector.push_back(tmp);
+                if (tmp.room != "SOME_ROOM")
+                {
+                    has_room_number = true;
+                }
+           }
+       }
+       file.close();
+    }
+
+    // Создаем карту
+    for (hmi_objects & obj : obj_vector)
+    {
+        QString key = has_room_number ? obj.room : obj.location;
+        obj_map[key].push_back(obj);
+    }
+}
+
+void load_obj_vector(QString & path, QVector<hmi_objects> & obj_vec)
+{
+    QFile file(path);
+
+    if (file.open(QIODevice::ReadOnly))
+    {
+       QTextStream in(&file);
+       while (!in.atEnd())
+       {
+           hmi_objects tmp(in.readLine());
+           if(tmp.valid)
+           {
+                obj_vec.push_back(tmp);
+           }
+       }
+       file.close();
+    }
+}
+
+void openFileXmlFromTemplate(pugi::xml_document& doc, const QString& filename)
+{
+
+    QFile file(filename);
+    if(file.open(QIODevice::ReadOnly))
+    {
+        doc.load_string(QString(file.readAll()).toStdString().data(), pugi::parse_default);
+        file.close();
+    }
+}
+
+
+void change_mnemo(pugi::xml_node mnemo_obj, hmi_objects & obj, int & x_cor)
+{
+    QStringList tag_split = obj.tag.split(".");
+    QString display_name = tag_split.last();
+
+    // Имя
+    mnemo_obj.attribute("name").set_value(display_name.toStdString().data());
+    mnemo_obj.attribute("display-name").set_value(display_name.toStdString().data());
+
+    // Расположение
+    pugi::xml_node x_node = findNodeByAttribute(mnemo_obj,"target","X");
+    pugi::xml_node y_node = findNodeByAttribute(mnemo_obj,"target","Y");
+    x_node.attribute("value").set_value(QString::number(x_cor).toStdString().data());
+    y_node.attribute("value").set_value("70");
+
+    x_cor += 10 + QString(findNodeByAttribute(mnemo_obj,"target","Width").attribute("value").value()).toInt();
+
+    // Alias
+    pugi::xml_node alias_node = findNodeByAttribute(mnemo_obj,"target","in_Alias").child("expr");
+    QString current_alias = alias_node.first_child().value();
+    QStringList alias_split = current_alias.split("+");
+    if (alias_split.length() == 1)
+    {
+        alias_node.first_child().set_value(obj.tag.toStdString().data());
+    }
+    else
+    {
+         QString alias_str = QString("%1 + \"%2\"").arg(alias_split.at(0), obj.tag);
+         alias_node.first_child().set_value(alias_str.toStdString().data());
+    }
+
+    // Заголовок
+    findNodeByAttribute(mnemo_obj,"value","Name").attribute("value").set_value(obj.name.toStdString().data());
+}
+
+void change_room(pugi::xml_node room_obj, hmi_objects obj, int & y_cor)
+{
+     // Расположение
+    pugi::xml_node x_node = findNodeByAttribute(room_obj,"target","X");
+    pugi::xml_node y_node = findNodeByAttribute(room_obj,"target","Y");
+    x_node.attribute("value").set_value("0");
+    y_node.attribute("value").set_value(QString::number(y_cor).toStdString().data());
+
+    room_obj.attribute("name").set_value(QString("Room_%1").arg(obj.room).toStdString().data());
+    room_obj.attribute("display-name").set_value(QString("Room_%1").arg(obj.room).toStdString().data());
+
+    findNodeByAttribute(room_obj,"value","Венткамера").attribute("value").set_value(obj.location.toStdString().data());
+    findNodeByAttribute(room_obj,"value","пом. 9.6").attribute("value").set_value(QString("пом. %1").arg(obj.room).toStdString().data());
+}
+
+
+void gen_hmi_form(QMap<QString,QVector<hmi_objects>> & obj_map,  pugi::xml_document & types_doc, QString save_name)
+{
+    if (obj_map.size() == 0)
+    {
+        return;
+    }
+
+    pugi::xml_document form_doc;
+    pugi::xml_document room_doc;
+
+    openFileXmlFromTemplate(form_doc,":/hmi_form.omobj");
+    openFileXmlFromTemplate(room_doc,":/hmi_room.xml");
+
+    int y_cor = 0;
+    bool save = false;
+
+    for(auto & key : obj_map.keys())
+    {
+        pugi::xml_node room =  findNodeByAttribute(room_doc,"name","Room_1");
+        if(!room)
+            continue;
+        pugi::xml_node room_obj = form_doc.child("type").append_copy(room);
+        change_room(room_obj,obj_map[key].at(0),y_cor);
+        y_cor += 200;
+
+        int obj_x_cor = 0;
+        for(hmi_objects & obj : obj_map[key])
+        {
+            pugi::xml_node mnemoznak =  findNodeByAttribute(types_doc.child("types"),"base-type",obj.type);
+            if(!mnemoznak)
+                continue;
+
+             pugi::xml_node mnemo_obj = room_obj.append_copy(mnemoznak);
+             change_mnemo(mnemo_obj, obj, obj_x_cor);
+             save = true;
+        }
+    }
+
+    if(save)
+        form_doc.save_file(save_name.append("/").append("FORM_BIG").append(".omobj").toStdWString().data(),"\t", pugi::format_indent, pugi::encoding_utf8);
+}
+
+void gen_hmi_nolink_form(QVector<hmi_objects> & obj_vec,  pugi::xml_document & types_doc, QString save_name)
+{
+    if (obj_vec.size() == 0)
+    {
+        return;
+    }
+
+    pugi::xml_document form_doc;
+    openFileXmlFromTemplate(form_doc,":/hmi_form.omobj");
+
+    pugi::xml_node link_node = findNodeByAttribute(types_doc,"base-type","NoLink");
+
+    int y_cor = 0;
+    bool save = false;
+
+    for(auto & obj : obj_vec)
+    {
+        pugi::xml_node link_obj = form_doc.child("type").append_copy(link_node);
+        findNodeByAttribute(link_obj,"target","X").attribute("value").set_value("0");
+        findNodeByAttribute(link_obj,"target","Y").attribute("value").set_value(y_cor);
+
+        QStringList tag_split = obj.tag.split(".");
+        QString display_name = "NoLink_" + tag_split.last();
+
+        link_obj.attribute("name").set_value(display_name.toStdString().data());
+        link_obj.attribute("display-name").set_value(display_name.toStdString().data());
+        findNodeByAttribute(link_obj,"value","Text").attribute("value").set_value(obj.name.toStdString().data());
+
+        //Alias
+        pugi::xml_node alias_node = findNodeByAttribute(link_obj,"target","in_Alias").child("expr");
+        QString current_alias = alias_node.first_child().value();
+        QStringList alias_split = current_alias.split("+");
+        if (alias_split.length() == 1)
+        {
+            alias_node.first_child().set_value(obj.tag.toStdString().data());
+        }
+        else
+        {
+             QString alias_str = QString("%1 + \"%2\"").arg(alias_split.at(0), obj.tag);
+             alias_node.first_child().set_value(alias_str.toStdString().data());
+        }
+
+        y_cor += 30;
+        save = true;
+    }
+
+    if(save)
+        form_doc.save_file(save_name.append("/").append("FORM_BIG_LINK").append(".omobj").toStdWString().data(),"\t", pugi::format_indent, pugi::encoding_utf8);
 }

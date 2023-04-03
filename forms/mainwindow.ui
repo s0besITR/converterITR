@@ -84,7 +84,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="documentMode">
      <bool>true</bool>
@@ -562,7 +562,7 @@
         <x>10</x>
         <y>220</y>
         <width>461</width>
-        <height>101</height>
+        <height>151</height>
        </rect>
       </property>
       <property name="title">
@@ -626,6 +626,25 @@ updateAlarm()</string>
        <property name="text">
         <string>Получить таблицу
 функций</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pb_HMI_ObjectGen">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>141</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string/>
+       </property>
+       <property name="statusTip">
+        <string>Загрузить xml с типами объектов, затем csv формата &lt;Type,Name,Alias,Location&gt;</string>
+       </property>
+       <property name="text">
+        <string>Генератор объектов</string>
        </property>
       </widget>
      </widget>

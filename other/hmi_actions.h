@@ -62,6 +62,28 @@ struct simple_walker : pugi::xml_tree_walker
     bool addIfNotDuplicate(QVector<QString>& tags, QString val);    // Добавить val в tags если его там нет
 };
 
+// Структура для генерации HMI объектов
+struct hmi_objects{
+    QString type;
+    QString name;
+    QString tag;
+    QString location;
+    QString room;
+
+    bool valid = false;
+
+    hmi_objects(QString s);
+};
+
+//Генерация объектов функции
+void load_obj_map(QString & path, QMap<QString,QVector<hmi_objects>> & obj_map);
+void load_obj_vector(QString & path, QVector<hmi_objects> & obj_vec);
+void gen_hmi_form(QMap<QString,QVector<hmi_objects>> & obj_map,  pugi::xml_document & types_doc, QString save_name);
+void gen_hmi_nolink_form(QVector<hmi_objects> & obj_vec,  pugi::xml_document & types_doc, QString save_name);
+void openFileXmlFromTemplate(pugi::xml_document& doc, const QString& filename);
+void change_mnemo(pugi::xml_node mnemo_obj, hmi_objects & obj, int & x_cor);
+void change_room(pugi::xml_node room_obj, hmi_objects obj, int & y_cor);
+
 // Чтение файла SETTINGS.xml в set
 void parseHMISettins(QString filename, hmi_settings & set);
 // Парсинг каждого файла экранов и обновление set

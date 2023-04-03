@@ -651,7 +651,12 @@ void MainWindow::on_pb_HMI_RemoveWaterMark_clicked()
                            "Использование Alpha.HMI без лицензии допустимо только для разработки и испытания проектов автоматизации инжиниринговыми компаниями.",
                            "Не допускается использование нелицензированных компонентов конечными пользователями на объектах.",
                            "Все права защищены © %1",
-                           "Все права защищены © АО \"Атомик Софт\""};
+                           "Все права защищены © АО \"Атомик Софт\"",
+                           "License is not found or limited.",
+                            "Using of Alpha.HMI with no license is only available for development and test.",
+                            "Unlicensed components are not allowed to be used by end users.",
+                            "All rights reserved © Automiq Software"
+                           };
 
     QByteArray content;
     int count = 0;
@@ -780,6 +785,58 @@ void MainWindow::on_pb_HMI_genFunctionTable_clicked()
    }
 }
 
+void MainWindow::on_pb_HMI_ObjectGen_clicked()
+{
+    QString file_name_types = QFileDialog::getOpenFileName(0,"Выберите .xml файл с типами объектов",this->recentPath,"*.xml");
+    if(file_name_types.length() == 0)
+        return;
+    updateRecentPath(file_name_types);
+
+    QString file_name_obj = QFileDialog::getOpenFileName(0,"Выберите .csv файл с объектами <Тип объекта, Имя, Алиас, Расположение (помещ)>",this->recentPath,"*.csv");
+    if(file_name_obj.length() == 0)
+        return;
+    updateRecentPath(file_name_obj);
+
+     // Загружаем типы
+    pugi::xml_document type_doc;
+    openFileXml(type_doc, file_name_types);
+
+    // Если есть узел NoLink, то делаем только линки
+    pugi::xml_node link_node = findNodeByAttribute(type_doc,"base-type","NoLink");
+
+    if (link_node)
+    {
+        QVector<hmi_objects> obj_vector;
+        load_obj_vector(file_name_obj, obj_vector);
+
+        QString save_name = QFileDialog::getExistingDirectory (0,"Выберите место для сохранения",this->recentPath,QFileDialog::ShowDirsOnly);
+        if(save_name.length() == 0)
+            return;
+        updateRecentPath(save_name);
+
+        gen_hmi_nolink_form(obj_vector, type_doc, save_name);
+
+        QMessageBox::information(nullptr,"Информация","Готово!                ", QMessageBox::Ok);
+
+
+    }
+    else
+    {
+         QMap<QString,QVector<hmi_objects>> obj_map;     // Карта объектов по ключу - номер помещения или расположение
+         // Загружаем карту
+         load_obj_map(file_name_obj,obj_map);
+
+         QString save_name = QFileDialog::getExistingDirectory (0,"Выберите место для сохранения",this->recentPath,QFileDialog::ShowDirsOnly);
+         if(save_name.length() == 0)
+             return;
+         updateRecentPath(save_name);
+
+         gen_hmi_form(obj_map, type_doc, save_name);
+
+         QMessageBox::information(nullptr,"Информация","Готово!                ", QMessageBox::Ok);
+    }
+
+}
 
 
 /*************ИНФ. ОБЕСПЕЧЕНИЕ**************/
@@ -1120,7 +1177,4 @@ void MainWindow::on_pb_Other_DenyRequest_clicked()
             qDebug() << s;
             */
 }
-
-
-
 

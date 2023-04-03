@@ -59,6 +59,8 @@ private slots:
 
     void on_action_about_triggered();
 
+    void on_pb_HMI_ObjectGen_clicked();
+
 private:
     QString recentPath;
     QSettings settings;
