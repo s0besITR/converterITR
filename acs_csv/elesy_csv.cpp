@@ -221,7 +221,7 @@ bool template_modbus::isValid()
 
 }
 
-void parseLineTemplates(QString s, QMap<QString,template_modbus_5ch> & template_map)
+void parseLineTemplates(QString s, QMap<QString,template_modbus_5ch> & template_map, QString FileName)
 {
     int prop;
     QString tag;
@@ -236,7 +236,10 @@ void parseLineTemplates(QString s, QMap<QString,template_modbus_5ch> & template_
     switch(prop){
         case 8814:{
             template_map[tag].m1.type = template_map[tag].m2.type = template_map[tag].m3.type = template_map[tag].m4.type = template_map[tag].m5.type = attributes.last().toInt();
-            template_map[tag].m1.csv_name = template_map[tag].m2.csv_name = template_map[tag].m3.csv_name = template_map[tag].m4.csv_name = template_map[tag].m5.csv_name = tag.split(".").first();
+            QString uso_name = tag.split(".").first();
+            if (!uso_name.toLower().startsWith("uso"))
+                uso_name = FileName.section(".",0,-2);
+            template_map[tag].m1.csv_name = template_map[tag].m2.csv_name = template_map[tag].m3.csv_name = template_map[tag].m4.csv_name = template_map[tag].m5.csv_name = uso_name;
         break;}
         // КП
         case 8888:{ template_map[tag].m1.station = attributes.last().replace(" ","");         break;}

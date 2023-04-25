@@ -47,7 +47,7 @@ struct template_modbus_5ch{
     template_modbus m5;
 };
 
-void parseLineTemplates(QString s, QMap<QString,template_modbus_5ch> & template_map);
+void parseLineTemplates(QString s, QMap<QString,template_modbus_5ch> & template_map, QString FileName);
 
 
 // Один тег модбас

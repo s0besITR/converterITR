@@ -371,7 +371,7 @@ QVector<template_modbus> MainWindow::parseModbusTemplates(QStringList file_list)
         while (!in.atEnd())
         {
             QString t = in.readLine();
-            parseLineTemplates(t, templates);
+            parseLineTemplates(t, templates, f.section("/",-1,-1));
         }
         file.close();
     }
