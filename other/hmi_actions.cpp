@@ -349,6 +349,8 @@ void change_mnemo(pugi::xml_node mnemo_obj, hmi_objects & obj, int & x_cor)
 
     // Заголовок
     findNodeByAttribute(mnemo_obj,"value","Name").attribute("value").set_value(obj.name.toStdString().data());
+    //или
+    findNodeByAttribute(mnemo_obj,"target","Text").attribute("value").set_value(obj.name.toStdString().data());
 }
 
 void change_room(pugi::xml_node room_obj, hmi_objects obj, int & y_cor)
