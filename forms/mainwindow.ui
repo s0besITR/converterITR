@@ -959,6 +959,7 @@ updateAlarm()</string>
     <property name="title">
      <string>Справка</string>
     </property>
+    <addaction name="action_doc"/>
     <addaction name="action_about"/>
    </widget>
    <addaction name="menu_settings"/>
@@ -983,6 +984,11 @@ updateAlarm()</string>
   <action name="action_about">
    <property name="text">
     <string>О приложении</string>
+   </property>
+  </action>
+  <action name="action_doc">
+   <property name="text">
+    <string>Открыть Документацию</string>
    </property>
   </action>
  </widget>

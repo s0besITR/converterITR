@@ -6,5 +6,7 @@
         <file>oven_dummy.xml</file>
         <file>hmi_form.omobj</file>
         <file>hmi_room.xml</file>
+        <file>Документация.docx</file>
+        <file>Документация.pdf</file>
     </qresource>
 </RCC>

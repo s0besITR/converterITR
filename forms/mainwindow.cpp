@@ -16,6 +16,7 @@
 #include "other/hmi_actions.h"
 #include "other/deny_req.h"
 #include "forms/aboutwindow.h"
+#include "QDesktopServices.h"
 
 extern QMap<unsigned int,QVector<io_csv>> IO_info_map;               // ИОшная карта
 
@@ -229,6 +230,14 @@ MainWindow::~MainWindow()
      aboutwindow dlg(this);
      dlg.exec();
  }
+
+ void MainWindow::on_action_doc_triggered()
+ {
+     QFile HelpFile(":/Документация.pdf");
+     HelpFile.copy(qApp->applicationDirPath().append("/Документация.pdf"));
+     QDesktopServices::openUrl(QUrl::fromLocalFile(qApp->applicationDirPath().append("/Документация.pdf")));
+ }
+
 
 /*************REGUL**************/
 
@@ -1177,4 +1186,6 @@ void MainWindow::on_pb_Other_DenyRequest_clicked()
             qDebug() << s;
             */
 }
+
+
 
