@@ -30,6 +30,9 @@ SettingsDialog::SettingsDialog(int index,QWidget *parent) :
      ui->edit_iec104_timeEDC->setValidator(int_val);
      ui->lineEdit_isagraf_maxlines->setValidator(int_val);
 
+     ui->ledit_Qwt->setValidator( new QRegularExpressionValidator(QRegularExpression("^((50)|([1-4][0-9]{1})|([1-9]))$")));
+     ui->ledit_Qrt->setValidator( new QRegularExpressionValidator(QRegularExpression("^((50)|([1-4][0-9]{1})|([1-9]))$")));
+
     ui->cbox_activeTab->addItems({"Regul", "MKLogic", "Alpha", "Инф. обесп.", "Другое"});
     ui->cbox_regulPLC->addItems({"Regul R500", "Regul R200"});   
     ui->cbox_IO_parse->addItems({"7050", "5564-5567"});
@@ -60,8 +63,11 @@ void SettingsDialog::readSettings()
            ui->edit_ModbusVersion->setText(settings.value("MBS_Device_Versions","1.6.5.1").toString());
            ui->cbx_uniteMemory->setChecked(settings.value("MBS_MemoryUnited","1").toBool());
            ui->cbx_OSTemplated->setChecked(settings.value("MBS_OS_Templates","0").toBool());
+           ui->cbx_TrigersQueue->setChecked(settings.value("MBS_QueueTrig","0").toBool());
            ui->cbx_AutoTime->setChecked(settings.value("IEC104S_autotime","0").toBool());
            ui->cbx_AutoTimeEDC->setChecked(settings.value("IEC104S_EDC_autotime","0").toBool());
+           ui->ledit_Qrt->setText(settings.value("MBS_QueueTrig_ReadTries","1").toString());
+           ui->ledit_Qwt->setText(settings.value("MBS_QueueTrig_WriteTries","1").toString());
        settings.endGroup();
 
        settings.beginGroup("/DevStudio");
@@ -100,8 +106,12 @@ void SettingsDialog::writeSettings()
             settings.setValue("MBS_Device_Versions", ui->edit_ModbusVersion->text().length() == 0 ? "0.0.0.0" : ui->edit_ModbusVersion->text());
             settings.setValue("MBS_MemoryUnited", ui->cbx_uniteMemory->isChecked());
             settings.setValue("MBS_OS_Templates", ui->cbx_OSTemplated->isChecked());
+            settings.setValue("MBS_QueueTrig", ui->cbx_TrigersQueue->isChecked());
             settings.setValue("IEC104S_autotime", ui->cbx_AutoTime->isChecked());
             settings.setValue("IEC104S_EDC_autotime", ui->cbx_AutoTimeEDC->isChecked());
+
+            settings.setValue("MBS_QueueTrig_ReadTries", ui->ledit_Qrt->text().length() == 0 ? "1" : ui->ledit_Qrt->text());
+            settings.setValue("MBS_QueueTrig_WriteTries", ui->ledit_Qwt->text().length() == 0 ? "1" : ui->ledit_Qwt->text());
        settings.endGroup();
 
        settings.beginGroup("/DevStudio");

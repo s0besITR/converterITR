@@ -84,7 +84,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <property name="documentMode">
      <bool>true</bool>
@@ -211,7 +211,7 @@
         <x>10</x>
         <y>180</y>
         <width>461</width>
-        <height>211</height>
+        <height>271</height>
        </rect>
       </property>
       <property name="title">
@@ -273,7 +273,7 @@
        <property name="geometry">
         <rect>
          <x>150</x>
-         <y>160</y>
+         <y>220</y>
          <width>141</width>
          <height>41</height>
         </rect>
@@ -358,12 +358,104 @@
         <string>Преобразовать шаблоны к OS версии</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="checkb_TrigersQueue">
+       <property name="geometry">
+        <rect>
+         <x>11</x>
+         <y>155</y>
+         <width>291</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Очередь на тригерах (только Modbus RTU)</string>
+       </property>
+       <property name="text">
+        <string>Использовать свою очередь для Modbus опроса</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_Qwt">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>180</y>
+         <width>111</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Попыток на запись</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="ledit_Qwt">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>180</y>
+         <width>41</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Кол-во попыток исполнить запрос на запись при ошибке</string>
+       </property>
+       <property name="inputMethodHints">
+        <set>Qt::ImhDigitsOnly</set>
+       </property>
+       <property name="text">
+        <string>1</string>
+       </property>
+       <property name="maxLength">
+        <number>2</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_Qrt">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>180</y>
+         <width>111</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Попыток на чтение</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="ledit_Qrt">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>180</y>
+         <width>41</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="statusTip">
+        <string>Кол-во попыток исполнить запрос на чтение при ошибке</string>
+       </property>
+       <property name="inputMethodHints">
+        <set>Qt::ImhDigitsOnly</set>
+       </property>
+       <property name="text">
+        <string>1</string>
+       </property>
+       <property name="maxLength">
+        <number>2</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="SokolMBS_Group">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>400</y>
+        <y>460</y>
         <width>461</width>
         <height>80</height>
        </rect>

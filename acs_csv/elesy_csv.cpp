@@ -204,6 +204,24 @@ bool template_modbus::operator<(const template_modbus& other)
 {
     return this->mapping < other.mapping;
 }
+bool cmpModbus(const template_modbus& a, const template_modbus& b)
+{
+    if (a.csv_name != b.csv_name)
+        return a.csv_name < b.csv_name;
+
+    if (a.modbus_module.toInt() != b.modbus_module.toInt())
+        return a.modbus_module.toInt() < b.modbus_module.toInt();
+
+    if (a.modbus_channel.toInt() != b.modbus_channel.toInt())
+        return a.modbus_channel.toInt() < b.modbus_channel.toInt();
+
+    if (a.mapping != b.mapping)
+        return (a.mapping < b.mapping);
+
+    return false;
+}
+
+queuePort::queuePort() : name(""), uso_name(""), r(0), w(0) {}
 
 bool template_modbus::isValid()
 {

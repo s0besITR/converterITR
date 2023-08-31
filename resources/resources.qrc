@@ -8,5 +8,7 @@
         <file>hmi_room.xml</file>
         <file>Документация.docx</file>
         <file>Документация.pdf</file>
+        <file>mbGVL_Port.xml</file>
+        <file>mbControl_QUEUE.xml</file>
     </qresource>
 </RCC>

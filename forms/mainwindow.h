@@ -56,12 +56,10 @@ private slots:
     void on_pb_IO_gen_txt_clicked();
 
     void on_pb_Other_DenyRequest_clicked();
-
     void on_action_about_triggered();
-
     void on_pb_HMI_ObjectGen_clicked();
-
     void on_action_doc_triggered();
+    void on_checkb_TrigersQueue_stateChanged(int arg1);
 
 private:
     QString recentPath;
@@ -77,7 +75,10 @@ private:
     void updateRecentPath(QString path);
     void updateRecentPath(QStringList files);
     QVector<template_modbus> parseModbusTemplates(QStringList file_list);
-    void saveModbusTemplates(QVector<template_modbus> & result_templates, QString folder);   
+    void saveModbusTemplates(QVector<template_modbus> & result_templates, QString folder);
+    void parseXMLforQueue(pugi::xml_document & doc, queuePort & q, QString dev_name);
+    void saveQueueGVLs(QMap<QString, queuePort> & queue_ports, QString path);
+    void saveQueuePRG(QMap<QString, queuePort> & queue_ports, QString path);
 
     //Водяной знак
     int removeWaterMark(QByteArray & content, QByteArray & mark);

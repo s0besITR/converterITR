@@ -47,6 +47,29 @@ struct template_modbus_5ch{
     template_modbus m5;
 };
 
+// Структура для подсчета каналов на чтение и запись в шаблоне
+struct ch_dev{
+    QString name;
+    int ch_read;     // Количество тригеров на чтение
+    int ch_write;   // Количество тригеров на запись
+
+    ch_dev(QString name, int r, int w) : name(name), ch_read(r), ch_write(w) {};
+};
+
+// Структура одного порта со всеми устройствами
+struct queuePort{
+    QString name;               // Имя модуля и порта (A9_Port1)
+    QString uso_name;           // Имя УСО (для сохранения в папку)
+    QVector<ch_dev> devices; // Названия устройств на этом порту упорядоченные (mbs_P23, mbs_P24_P24r,...) вместе с каналами на чтение и запись
+    QVector<QString> cmd_triggers;  // Триггеры команд, которые были в шаблоне (сохраняем их сюда, потому что в шаблоне мы их поменяем)
+
+    int r;      // кол-во каналов на чтение
+    int w;      // кол-во каналов на запись
+    queuePort();
+};
+
+bool cmpModbus(const template_modbus& a, const template_modbus& b);     // Для сортировки по имени модуля и порта (для очереди)
+
 void parseLineTemplates(QString s, QMap<QString,template_modbus_5ch> & template_map, QString FileName);
 
 

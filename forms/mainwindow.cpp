@@ -82,6 +82,8 @@ MainWindow::~MainWindow()
  {
      ui->cbox_regulPLC->addItems({"Regul R500", "Regul R200"});
      ui->btn_TemplateGen->setDisabled(true);
+     ui->ledit_Qwt->setValidator( new QRegularExpressionValidator(QRegularExpression("^((50)|([1-4][0-9]{1})|([1-9]))$")));
+     ui->ledit_Qrt->setValidator( new QRegularExpressionValidator(QRegularExpression("^((50)|([1-4][0-9]{1})|([1-9]))$")));
  }
 
  // Инициализация вкладки 1
@@ -121,7 +123,10 @@ MainWindow::~MainWindow()
             this->ui->chb_RegulBus_OS->setCheckState(settings.value("RegulBus_OS","1").toBool() ? Qt::Checked : Qt::Unchecked);
             this->ui->chb_iec104s_OS->setCheckState(settings.value("Iec104S_OS","1").toBool() ? Qt::Checked : Qt::Unchecked);            
             this->ui->checkb_TemlatesOS->setCheckState(settings.value("MBS_OS_Templates","1").toBool() ? Qt::Checked : Qt::Unchecked);
-            this->ui->ledit_TemplatesVersion->setText(settings.value("MBS_Device_Versions","1.6.5.1").toString());
+            this->ui->checkb_TrigersQueue->setCheckState(settings.value("MBS_QueueTrig","1").toBool() ? Qt::Checked : Qt::Unchecked);
+            this->ui->ledit_TemplatesVersion->setText(settings.value("MBS_Device_Versions","1.6.5.1").toString());            
+            this->ui->ledit_Qrt->setText(settings.value("MBS_QueueTrig_ReadTries","1").toString());
+            this->ui->ledit_Qwt->setText(settings.value("MBS_QueueTrig_WriteTries","1").toString());
 
             QString p = settings.value("TemplatePath","").toString();
             if(p.length()==0 || !QDir(p).exists())
@@ -178,7 +183,9 @@ MainWindow::~MainWindow()
             if(settings.value("MBS_MemoryUnited","").toString().length() == 0)          // Modbus использовать указатели на общую память
                 settings.setValue("MBS_MemoryUnited", true);           
             if(settings.value("MBS_OS_Templates","").toString().length() == 0)          // Modbus шаблоны преобразовывать к OS
-                settings.setValue("MBS_OS_Templates", false);            
+                settings.setValue("MBS_OS_Templates", false);
+            if(settings.value("MBS_QueueTrig","").toString().length() == 0)             // Modbus использовать очередь на тригерах
+                settings.setValue("MBS_QueueTrig", false);
             if(settings.value("IEC104S_autotime","").toString().length() == 0)          // IEC104s Автоматическое присвоение метки времени
                 settings.setValue("IEC104S_autotime", false);                       
             if(settings.value("IEC104S_EDC_autotime","").toString().length() == 0)      // IEC104s EDC Автоматическое присвоение метки времени
@@ -186,7 +193,11 @@ MainWindow::~MainWindow()
             if(settings.value("MBS_Device_Versions","").toString().length() == 0)       // Версия модбас устройств
                 settings.setValue("MBS_Device_Versions", "1.6.5.1");
             if(settings.value("TemplatePath","").toString().length() == 0)              // Запоминаем путь шаблонов
-                settings.setValue("TemplatePath", "");
+                settings.setValue("TemplatePath", "");            
+            if(settings.value("MBS_QueueTrig_ReadTries","").toString().length() == 0)   // Очередь модбас. Попыток на чтение
+                settings.setValue("MBS_QueueTrig_ReadTries", "1");
+            if(settings.value("MBS_QueueTrig_WriteTries","").toString().length() == 0)   // Очередь модбас. Попыток на запись
+                settings.setValue("MBS_QueueTrig_WriteTries", "1");
         settings.endGroup();
 
         settings.beginGroup("/DevStudio");
@@ -345,6 +356,10 @@ void MainWindow::on_ledit_TemplatesPath_textChanged(const QString &arg1)
 // Событие на вкладке Regul при нажатии на кнопку Загрузить csv (для генерации шаблонов модбас)
 void MainWindow::on_btn_TemplateGen_clicked()
 {
+
+    if (ui->ledit_Qwt->text().length() == 0)       ui->ledit_Qwt->setText("1");
+    if (ui->ledit_Qrt->text().length() == 0)       ui->ledit_Qrt->setText("1");
+
     QStringList file_list = QFileDialog::getOpenFileNames(0,"Выберите все файл(ы) Infinity Server.csv",this->recentPath,"*.csv");    
     if(file_list.length() == 0)
         return;
@@ -407,8 +422,8 @@ QVector<template_modbus> MainWindow::parseModbusTemplates(QStringList file_list)
                 tmp_vec.push_back(t);
 
     // Если каких-то шаблонов нет, показываем сообщение с их списком
-    std::sort(result_templates.begin(), result_templates.end());
-    std::sort(tmp_vec.begin(), tmp_vec.end());
+    std::sort(result_templates.begin(), result_templates.end(), cmpModbus);
+    std::sort(tmp_vec.begin(), tmp_vec.end(), cmpModbus);
     std::vector<template_modbus> difference;
     std::set_difference(result_templates.begin(), result_templates.end(),tmp_vec.begin(), tmp_vec.end(), std::back_inserter( difference ));
     QStringList xml_not_found;
@@ -435,12 +450,261 @@ QVector<template_modbus> MainWindow::parseModbusTemplates(QStringList file_list)
     }
 
     // Теперь tmp_vec - список 100% проверенный
+
+    // Сортируем его по номеру модуля и порта на случай, если нужно будет делать очередь
+    //std::sort(tmp_vec_result.begin(), tmp_vec_result.end(), cmpModbus);
     return tmp_vec_result;
+}
+
+
+// Берем xml документ шаблона и заполняем информацией ссылку на структуру порта
+void MainWindow::parseXMLforQueue(pugi::xml_document & doc, queuePort & q, QString dev_name)
+{
+    ch_dev device = ch_dev(dev_name, 0, 0);
+
+    pugi::xml_node host_node = findNodeByName(doc.root(), "HostParameterSet");
+    if (!host_node)        return;
+
+    for (auto & ps_node : host_node.children("ParameterSection"))
+    {
+        QString ch_type = "hz";
+        QString status_id = "";
+        QString status_name = "";
+        pugi::xml_node trig_node;
+        for (auto & param_node : ps_node.children("Parameter"))
+        {
+            if (QString(param_node.child_value("Name")) == "Data")
+                ch_type = QString(param_node.child("Attributes").attribute("channel").as_string());
+            if (QString(param_node.child_value("Name")) == "Status")
+            {
+                status_id = param_node.attribute("ParameterId").value();
+                status_name = param_node.child("Value").attribute("name").value();
+            }
+            if (QString(param_node.child_value("Name")) == "Trigger")
+                trig_node = param_node;
+        }
+
+        if (ch_type == "hz")
+            continue;
+
+        if (!trig_node) // Если триггера нет, добавляем его
+        {
+            // Увеличили индекс на 1
+            QString trig_00num = QString::number(status_name.right(status_name.length() - status_name.lastIndexOf('_') - 1).toInt() + 1);
+            for (int i = 4, len = trig_00num.length(); i > len; --i)
+                trig_00num.prepend('0');
+
+            QString trig_name = status_name.mid(0, status_name.lastIndexOf('_') + 1) + trig_00num;
+            QString trig_id =  QString::number(status_id.toInt() + 1);
+
+            trig_node = ps_node.append_child("Parameter");
+            trig_node.append_attribute("ParameterId").set_value(trig_id.toStdString().c_str());
+            trig_node.append_attribute("type").set_value("std:BIT");
+            trig_node.append_child("Attributes").append_attribute("channel").set_value("output");
+            pugi::xml_node val_node = trig_node.append_child("Value");
+            val_node.append_attribute("name").set_value(trig_name.toStdString().c_str());
+            val_node.append_attribute("visiblename").set_value("Trigger");
+            trig_node.append_child("Name").append_child(node_pcdata).set_value("Trigger");
+            trig_node.append_child("Mapping").append_child(node_pcdata).set_value("converter_mapping");
+        }
+
+        if (ch_type == "input")
+        {
+             QString r_map = QString("Application.mbGVL_%1.%1_read_triggers[%2]").arg(q.name).arg(q.r);
+             trig_node.child("Mapping").first_child().set_value(r_map.toStdString().c_str());
+             device.ch_read++;
+             q.r++;
+        }
+        else if (ch_type == "output")
+        {
+            QString w_map = QString("Application.mbGVL_%1.%1_write_triggers[%2]").arg(q.name).arg(q.w);
+            QString cmd_trig = trig_node.child("Mapping").first_child().value();
+            q.cmd_triggers.push_back(cmd_trig.replace("Application.", ""));
+            trig_node.child("Mapping").first_child().set_value(w_map.toStdString().c_str());
+            device.ch_write++;
+            q.w++;
+        }
+    }
+
+    for (auto & p_node : host_node.children("Parameter"))
+    {
+         if (QString(p_node.attribute("type").value()) != "localTypes:Channel")
+             continue;
+         findNodeByAttribute(p_node, "name", "ChType").first_child().set_value("1");
+    }
+
+    q.devices.push_back(device);
+
+}
+
+void MainWindow::saveQueuePRG(QMap<QString, queuePort> & queue_ports, QString path)
+{
+
+    QString FB_Call = "%1_Control(\n\
+\txEnable := IsActive,\n\
+\tpResponseOkCntRead := ADR(%1_responseOkCntRead),\n\
+\tpResponseErrCntRead := ADR(%1_responseErrCntRead),\n\
+\tpResponseOkCntWrite := ADR(%1_responseOkCntWrite),\n\
+\tpResponseErrCntWrite := ADR(%1_responseErrCntWrite),\n\
+\tpDoWrite:= ADR(%2),\n\
+\tpRead_triggers:= ADR(%1_read_triggers),\n\
+\tudiNumberReadChannels:= %3,\n\
+\tpWrite_triggers:= ADR(%1_write_triggers),\n\
+\tudiNumberWriteChannels:= %4,\n\
+\tusiWriteTries := %5,\n\
+\tusiReadTries := %6);\n\n";
+
+
+    QString read_ok =   "%1_responseOkCntRead[%2] := %3.responseOkCnt;\n";
+    QString read_err =  "%1_responseErrCntRead[%2] := %3.responseErrCnt;\n";
+    QString write_ok =   "%1_responseOkCntWrite[%2] := %3.responseOkCnt;\n";
+    QString write_err =  "%1_responseErrCntWrite[%2] := %3.responseErrCnt;\n";
+
+
+
+    QMap<QString, QMap<QString, queuePort>> queue_usos;
+    for (auto & key : queue_ports.keys())
+        queue_usos[queue_ports[key].uso_name][key] = queue_ports[key];
+
+
+    for (auto & uso_key : queue_usos.keys())
+    {
+        QString ST_Content = "";
+        // Загружаем PRG из ресурсов в doc
+        QFile file(":/mbControl_QUEUE.xml");
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        QString content = file.readAll();
+        file.close();
+        pugi::xml_document doc;
+        doc.load_string(content.toStdString().c_str(),pugi::parse_default);
+
+        // Создаем дирректорию, если ее нет
+        QString save_prg_path = path + "/" + uso_key + "/modules/Queue";
+        QDir dir(save_prg_path);
+        if (!dir.exists())
+            dir.mkpath(".");
+
+        // Находим узел локальных переменных
+        pugi::xml_node local_vars =  findNodeByName(doc.root(), "localVars");
+
+        // Проходимся по всем портам в нашей УСО
+        for (auto & key : queue_usos[uso_key].keys())
+        {
+            pugi::xml_node var_node = local_vars.append_child("variable");
+            var_node.append_attribute("name").set_value(QString("%1_Control").arg(queue_usos[uso_key][key].name).toStdString().c_str());
+            var_node.append_child("type").append_child("derived").append_attribute("name").set_value("MbQueueControl");
+
+            int ch_index = 0;
+            QString read_ok_block = "";
+            QString read_err_block  = "";
+            QString write_ok_block = "";
+            QString write_err_block = "";
+
+            ST_Content.append(QString("(*%1*)\n").arg(queue_usos[uso_key][key].name));
+
+            for (auto & dev : queue_usos[uso_key][key].devices)
+                for (int i = 0; i != dev.ch_read; ++i)
+                {
+                    read_ok_block.append(read_ok.arg(queue_usos[uso_key][key].name).arg(ch_index).arg(dev.name));
+                    read_err_block.append(read_err.arg(queue_usos[uso_key][key].name).arg(ch_index).arg(dev.name));
+                    ch_index++;
+               }
+
+            if (read_ok_block.length() !=0)
+                 ST_Content.append(read_ok_block).append('\n').append(read_err_block).append('\n');
+
+            ch_index = 0;
+            for (auto & dev : queue_usos[uso_key][key].devices)
+                for (int i = 0; i != dev.ch_write; ++i)
+                {
+                    write_ok_block.append(write_ok.arg(queue_usos[uso_key][key].name).arg(ch_index).arg(dev.name));
+                    write_err_block.append(write_err.arg(queue_usos[uso_key][key].name).arg(ch_index).arg(dev.name));
+                    ch_index++;
+                }
+
+            if (write_ok_block.length() !=0)
+                 ST_Content.append(write_ok_block).append('\n').append(write_err_block).append('\n');
+
+            ST_Content.append(
+                        FB_Call.arg(queue_usos[uso_key][key].name).
+                    arg(queue_usos[uso_key][key].cmd_triggers.first()).
+                    arg(queue_usos[uso_key][key].r).
+                    arg(queue_usos[uso_key][key].w).
+                    arg(ui->ledit_Qwt->text()).
+                    arg(ui->ledit_Qrt->text())
+                        );
+        }
+
+        findNodeByName(doc.root(), "ST").first_child().first_child().set_value(ST_Content.toStdString().c_str());
+
+        doc.save_file(save_prg_path.append("/").append("mbControl").append(".xml").toStdWString().data(),"\t", pugi::format_indent, pugi::encoding_utf8);
+    }
+}
+
+void MainWindow::saveQueueGVLs(QMap<QString, queuePort> & queue_ports, QString path)
+{
+    auto insertArrayVar = [](pugi::xml_node & g_vars, QString var_name, QString b_type, int u_bound){
+        if (u_bound <= 0) u_bound = 0;
+        pugi::xml_node var_node = g_vars.insert_child_before("variable", g_vars.child("addData"));
+        var_node.append_attribute("name").set_value(var_name.toStdString().c_str());
+        pugi::xml_node arr_node = var_node.append_child("type").append_child("array");
+        pugi::xml_node dim_node = arr_node.append_child("dimension");
+        dim_node.append_attribute("lower").set_value("0");
+        dim_node.append_attribute("upper").set_value(u_bound);
+        arr_node.append_child("baseType").append_child(b_type.toStdString().c_str());
+    };
+
+    for (auto & key : queue_ports.keys())
+    {
+        QString dir_path = path + "/" + queue_ports[key].uso_name + "/modules/Queue";
+        QDir dir(dir_path);
+        if (!dir.exists())
+            dir.mkpath(".");
+
+        QFile file(":/mbGVL_Port.xml");
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        QString content = file.readAll();
+        file.close();
+        pugi::xml_document doc;
+        doc.load_string(content.toStdString().c_str(),pugi::parse_default);
+
+        pugi::xml_node node_vars =  findNodeByName(doc.root(), "globalVars");
+
+        // Меняем имя GVL в двух местах
+        QString gvl_name = "mbGVL_" + queue_ports[key].name;
+        node_vars.attribute("name").set_value(gvl_name.toStdString().c_str());
+        findNodeByAttribute(doc.root(),"Name", "mbGVL_Port").attribute("Name").set_value(gvl_name.toStdString().c_str());
+
+        // Добавляем массивы
+        insertArrayVar(node_vars, QString("%1_read_triggers").arg(queue_ports[key].name), "BOOL", queue_ports[key].r - 1);
+        insertArrayVar(node_vars, QString("%1_write_triggers").arg(queue_ports[key].name), "BOOL", queue_ports[key].w - 1);
+        insertArrayVar(node_vars, QString("%1_responseOkCntRead").arg(queue_ports[key].name), "UDINT", queue_ports[key].r - 1);
+        insertArrayVar(node_vars, QString("%1_responseErrCntRead").arg(queue_ports[key].name), "UDINT", queue_ports[key].r - 1);
+        insertArrayVar(node_vars, QString("%1_responseOkCntWrite").arg(queue_ports[key].name), "UDINT", queue_ports[key].w - 1);
+        insertArrayVar(node_vars, QString("%1_responseErrCntWrite").arg(queue_ports[key].name), "UDINT", queue_ports[key].w - 1);
+
+        // Добавляем триггеры
+        if (queue_ports[key].cmd_triggers.empty())
+            queue_ports[key].cmd_triggers.push_back(QString("_trigger_EMPTY_%1").arg(queue_ports[key].name));
+
+        for (QString & s : queue_ports[key].cmd_triggers)
+        {
+            pugi::xml_node var_node = node_vars.insert_child_before("variable", node_vars.child("addData"));
+            var_node.append_attribute("name").set_value(s.toStdString().c_str());
+            var_node.append_child("type").append_child("BOOL");
+        }
+
+        // Сохраняем порт
+        doc.save_file(dir.path().append("/").append(queue_ports[key].name).append(".xml").toStdWString().data(),"\t", pugi::format_indent, pugi::encoding_utf8);
+    }
+
 }
 
 // Делаем преобразования в шаблонах модбас и сохраняем их
 void MainWindow::saveModbusTemplates(QVector<template_modbus> & result_templates, QString folder)
 {
+    QMap<QString, queuePort> queue_ports;                         // Карта портов для очереди (ключ - имя порта и имя УСО)
+
     // сначала удаляем все папки modules предыдущие
     for(auto & templ : result_templates)
     {
@@ -453,6 +717,13 @@ void MainWindow::saveModbusTemplates(QVector<template_modbus> & result_templates
     // Для каждого шаблона
     for(auto & templ : result_templates)
     {
+        // Для TCP устройств очереди не надо, кидаем ошибку
+        if (templ.type == 1 && ui->checkb_TrigersQueue->isChecked())
+        {
+            QString msg = QString("Для TCP шаблонов своя очередь не поддерживается!");
+            throw std::runtime_error(msg.toStdString().data());
+        }
+
         // Считываем его содержимое в content
         QString template_path = this->ui->ledit_TemplatesPath->text() + "/" + templ.dev_template + ".xml";
         QFile file(template_path);
@@ -479,6 +750,15 @@ void MainWindow::saveModbusTemplates(QVector<template_modbus> & result_templates
             else                            type_node.first_child().set_value(ui->checkb_TemlatesOS->isChecked() ? "50096" : "40096");      // rtu
         }
 
+        //ОЧЕРЕДЬ
+        if (ui->checkb_TrigersQueue->isChecked())
+        {
+            QString port_name = QString("A%1_Port%2").arg(templ.modbus_module, templ.modbus_channel);
+            queue_ports[templ.csv_name + "_" + port_name].name = port_name;
+            queue_ports[templ.csv_name + "_" + port_name].uso_name = templ.csv_name;
+            parseXMLforQueue(doc, queue_ports[templ.csv_name + "_" + port_name], templ.mapping);
+        }
+
         // Сохраняем
         QString dir_path;
         if(templ.type == 1)
@@ -488,7 +768,7 @@ void MainWindow::saveModbusTemplates(QVector<template_modbus> & result_templates
         QDir dir(dir_path);
         if (!dir.exists())
             dir.mkpath(".");
-        doc.save_file(dir.path().append("/").append(templ.mapping).append(".xml").toStdWString().data(),"\t", pugi::format_indent | pugi::format_indent_attributes, pugi::encoding_utf8);
+        doc.save_file(dir.path().append("/").append(templ.mapping).append(".xml").toStdWString().data(),"\t", pugi::format_indent, pugi::encoding_utf8);
 
        //Копируем пустой файл DEV_ALL из ресурсов на диск, если его там нет
        if(!QFile::exists(dir_path + "/DEV_ALL.XML"))
@@ -516,25 +796,45 @@ void MainWindow::saveModbusTemplates(QVector<template_modbus> & result_templates
        if(templ.oven_dummy)
        {
            pugi::xml_document doc_dummy;
-           QFile file(":/oven_dummy.xml");
+           QString dummy_name = ":/oven_dummy.xml";
+           QFile file(dummy_name);
            if(file.open(QIODevice::ReadOnly))
            {
                doc_dummy.load_string(QString(file.readAll()).toStdString().data(), pugi::parse_default);
                file.close();
            }
+
+           //ОЧЕРЕДЬ
+           if (ui->checkb_TrigersQueue->isChecked())
+           {
+               QString port_name = QString("A%1_Port%2").arg(templ.modbus_module, templ.modbus_channel);
+               queue_ports[templ.csv_name + "_" + port_name].name = port_name;
+               queue_ports[templ.csv_name + "_" + port_name].uso_name = templ.csv_name;
+               parseXMLforQueue(doc_dummy, queue_ports[templ.csv_name + "_" + port_name], QString("oven_dummy_%1").arg(templ.mapping));
+               findNodeByAttribute(doc_dummy.root(), "name", "oven_dummy").attribute("name").set_value(QString("oven_dummy_%1").arg(templ.mapping).toStdString().c_str());
+           }
+
            pugi::xml_node cfg_dummy = doc_dummy.child("configuration");
            findNodeByName(doc_dummy, "Version").first_child().set_value(this->ui->ledit_TemplatesVersion->text().toStdString().c_str());
            findNodeByName(doc_dummy, "Type").first_child().set_value(ui->checkb_TemlatesOS->isChecked() ? "50096" : "40096");      // rtu
 
            cfgs_node.append_copy(cfg_dummy);
            obj_node = struct_node.append_child("Object");
-           obj_node.append_attribute("Name").set_value("oven_dummy");
+           obj_node.append_attribute("Name").set_value(QString("oven_dummy_%1").arg(templ.mapping).toStdString().c_str());
            obj_node.append_attribute("ObjectId").set_value("aee2fe06-f677-434c-8c3d-69670ehui001");
-           obj_node.append_attribute("xmlns").set_value("");
+           obj_node.append_attribute("xmlns").set_value("");           
+
        }
 
-       doc_dev.save_file(dir_path.append("/DEV_ALL.XML").toStdWString().data(),"\t", pugi::format_indent | pugi::format_indent_attributes, pugi::encoding_utf8);
+       doc_dev.save_file(dir_path.append("/DEV_ALL.XML").toStdWString().data(),"\t", pugi::format_indent, pugi::encoding_utf8);
     }
+
+    if (ui->checkb_TrigersQueue->isChecked())
+    {
+        saveQueueGVLs(queue_ports, folder);
+        saveQueuePRG(queue_ports, folder);
+    }
+
 }
 
 
@@ -1188,4 +1488,11 @@ void MainWindow::on_pb_Other_DenyRequest_clicked()
 }
 
 
+
+
+void MainWindow::on_checkb_TrigersQueue_stateChanged(int arg1)
+{
+    ui->ledit_Qrt->setDisabled(arg1 == Qt::Unchecked);
+    ui->ledit_Qwt->setDisabled(arg1 == Qt::Unchecked);
+}
 
