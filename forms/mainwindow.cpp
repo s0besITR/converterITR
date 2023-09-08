@@ -458,9 +458,9 @@ QVector<template_modbus> MainWindow::parseModbusTemplates(QStringList file_list)
 
 
 // Берем xml документ шаблона и заполняем информацией ссылку на структуру порта
-void MainWindow::parseXMLforQueue(pugi::xml_document & doc, queuePort & q, QString dev_name)
+void MainWindow::parseXMLforQueue(pugi::xml_document & doc, queuePort & q, QString dev_name, uint delay_time)
 {
-    ch_dev device = ch_dev(dev_name, 0, 0);
+    ch_dev device = ch_dev(dev_name, 0, 0, delay_time);
 
     pugi::xml_node host_node = findNodeByName(doc.root(), "HostParameterSet");
     if (!host_node)        return;
@@ -552,7 +552,8 @@ void MainWindow::saveQueuePRG(QMap<QString, queuePort> & queue_ports, QString pa
 \tpWrite_triggers:= ADR(%1_write_triggers),\n\
 \tudiNumberWriteChannels:= %4,\n\
 \tusiWriteTries := %5,\n\
-\tusiReadTries := %6);\n\n";
+\tusiReadTries := %6,\n\
+\tpDelayTimes := ADR(%1_delayTime));\n\n";
 
 
     QString read_ok =   "%1_responseOkCntRead[%2] := %3.responseOkCnt;\n";
@@ -652,6 +653,19 @@ void MainWindow::saveQueueGVLs(QMap<QString, queuePort> & queue_ports, QString p
         dim_node.append_attribute("lower").set_value("0");
         dim_node.append_attribute("upper").set_value(u_bound);
         arr_node.append_child("baseType").append_child(b_type.toStdString().c_str());
+        return var_node;
+    };
+
+    auto initDelayNode = [](pugi::xml_node & d_node, QVector<ch_dev> & devices)
+    {
+        pugi::xml_node values_node = d_node.append_child("initialValue").append_child("arrayValue");
+        for (auto & dev : devices)
+        {
+            pugi::xml_node value_node = values_node.append_child("value");
+            if (dev.ch_read > 1)
+                value_node.append_attribute("repetitionValue").set_value(dev.ch_read);
+            value_node.append_child("simpleValue").append_attribute("value").set_value(dev.delay_t);
+        }
     };
 
     for (auto & key : queue_ports.keys())
@@ -682,6 +696,8 @@ void MainWindow::saveQueueGVLs(QMap<QString, queuePort> & queue_ports, QString p
         insertArrayVar(node_vars, QString("%1_responseErrCntRead").arg(queue_ports[key].name), "UDINT", queue_ports[key].r - 1);
         insertArrayVar(node_vars, QString("%1_responseOkCntWrite").arg(queue_ports[key].name), "UDINT", queue_ports[key].w - 1);
         insertArrayVar(node_vars, QString("%1_responseErrCntWrite").arg(queue_ports[key].name), "UDINT", queue_ports[key].w - 1);
+        pugi::xml_node delay_node = insertArrayVar(node_vars, QString("%1_delayTime").arg(queue_ports[key].name), "DINT", queue_ports[key].r - 1);
+        initDelayNode(delay_node, queue_ports[key].devices);
 
         // Добавляем триггеры
         if (queue_ports[key].cmd_triggers.empty())
@@ -756,7 +772,7 @@ void MainWindow::saveModbusTemplates(QVector<template_modbus> & result_templates
             QString port_name = QString("A%1_Port%2").arg(templ.modbus_module, templ.modbus_channel);
             queue_ports[templ.csv_name + "_" + port_name].name = port_name;
             queue_ports[templ.csv_name + "_" + port_name].uso_name = templ.csv_name;
-            parseXMLforQueue(doc, queue_ports[templ.csv_name + "_" + port_name], templ.mapping);
+            parseXMLforQueue(doc, queue_ports[templ.csv_name + "_" + port_name], templ.mapping, templ.delay_time);
         }
 
         // Сохраняем
@@ -810,7 +826,7 @@ void MainWindow::saveModbusTemplates(QVector<template_modbus> & result_templates
                QString port_name = QString("A%1_Port%2").arg(templ.modbus_module, templ.modbus_channel);
                queue_ports[templ.csv_name + "_" + port_name].name = port_name;
                queue_ports[templ.csv_name + "_" + port_name].uso_name = templ.csv_name;
-               parseXMLforQueue(doc_dummy, queue_ports[templ.csv_name + "_" + port_name], QString("oven_dummy_%1").arg(templ.mapping));
+               parseXMLforQueue(doc_dummy, queue_ports[templ.csv_name + "_" + port_name], QString("oven_dummy_%1").arg(templ.mapping), 0);
                findNodeByAttribute(doc_dummy.root(), "name", "oven_dummy").attribute("name").set_value(QString("oven_dummy_%1").arg(templ.mapping).toStdString().c_str());
            }
 

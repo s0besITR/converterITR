@@ -76,7 +76,7 @@ private:
     void updateRecentPath(QStringList files);
     QVector<template_modbus> parseModbusTemplates(QStringList file_list);
     void saveModbusTemplates(QVector<template_modbus> & result_templates, QString folder);
-    void parseXMLforQueue(pugi::xml_document & doc, queuePort & q, QString dev_name);
+    void parseXMLforQueue(pugi::xml_document & doc, queuePort & q, QString dev_name, uint delay_time);
     void saveQueueGVLs(QMap<QString, queuePort> & queue_ports, QString path);
     void saveQueuePRG(QMap<QString, queuePort> & queue_ports, QString path);
 

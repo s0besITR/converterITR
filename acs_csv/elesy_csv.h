@@ -32,7 +32,8 @@ struct template_modbus{
     QString ip;                                 // IP адрес             (8813, 8820, 8831, 8837, 8915)
     QString dev_template;                       // Шаблон устройства    (8821, 8822, 8832, 8838, 8916)
     QString csv_name;                           // Имя CSV
-    bool oven_dummy;                            //
+    bool oven_dummy;                            // Modbus_DelayBetweenPolls (89101)
+    uint delay_time;                            // Modbus_DelayTime (89102)
     template_modbus();
 
     bool operator<(const template_modbus& other);
@@ -52,8 +53,9 @@ struct ch_dev{
     QString name;
     int ch_read;     // Количество тригеров на чтение
     int ch_write;   // Количество тригеров на запись
+    uint delay_t;   // По-умолчанию - 0. Число для задержки в опросе ОВЕНов
 
-    ch_dev(QString name, int r, int w) : name(name), ch_read(r), ch_write(w) {};
+    ch_dev(QString name, int r, int w, int t) : name(name), ch_read(r), ch_write(w), delay_t(t) {};
 };
 
 // Структура одного порта со всеми устройствами

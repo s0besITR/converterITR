@@ -198,7 +198,7 @@ void exportSokol_Map(QVector<sokol_node> &nodes, QString path)
 }
 
 
-template_modbus::template_modbus() : type(0), oven_dummy(false) {}
+template_modbus::template_modbus() : type(0), oven_dummy(false), delay_time(0) {}
 
 bool template_modbus::operator<(const template_modbus& other)
 {
@@ -305,5 +305,15 @@ void parseLineTemplates(QString s, QMap<QString,template_modbus_5ch> & template_
                     template_map[tag].m5.oven_dummy = oven_dymmy;
                     break;
                     }
+        //Delay time
+        case 89102: {
+            uint delay_t = attributes.last().replace(" ","").toUInt();
+            template_map[tag].m1.delay_time = delay_t;
+            template_map[tag].m2.delay_time = delay_t;
+            template_map[tag].m3.delay_time = delay_t;
+            template_map[tag].m4.delay_time = delay_t;
+            template_map[tag].m5.delay_time = delay_t;
+            break;
+        }
     }
 }
