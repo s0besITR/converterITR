@@ -169,11 +169,16 @@ void parse_line_complex(QString & str)
     static QString description;
     static QString IEC_address = "";
     static QString IEC_address_type = "";
+    static QString tag;
 
     QStringList attributes = str.split(",");
     if(attributes.length() < 2)
         return;
     prop = attributes.at(1);
+
+    if (tag != attributes.at(0))
+        description = "";
+    tag = attributes.at(0);
 
     if(prop == "101")
     {
@@ -210,11 +215,16 @@ void parse_line_native(QString & str)
 {
     QString prop;
     static QString description;
+    static QString tag;
 
     QStringList attributes = str.split(",");
     if(attributes.length() < 2)
         return;
     prop = attributes.at(1);
+
+    if (tag != attributes.at(0))
+        description = "";
+    tag = attributes.at(0);
 
     if(prop == "101")
     {
