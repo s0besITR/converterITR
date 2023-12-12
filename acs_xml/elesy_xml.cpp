@@ -924,13 +924,27 @@ void Elesy_XML::save(QString & folder)
     this->app_doc.save_file(dir.path().append("/REGUL_Application.xml").toStdWString().data(),"\t", pugi::format_indent | pugi::format_indent_attributes, pugi::encoding_utf8);
 
     // Сохраняем IEC104 каналы
+    int edc_count = 0;
+    int st_count = 0;
+    QString filename_arg = "";
     for(iec104Slave & iec104 : this->slaves_104)
     {
         if(!iec104.checked)
             continue;
 
-        QFile file_data(dir.path() + "/" + QString("REGUL_IEC104_%1_DATA.iec104data.xml").arg(iec104.module_name.contains("EDC",Qt::CaseInsensitive) ? "EDC" : "ST"));
-        QFile file_cmd(dir.path() + "/" + QString("REGUL_IEC104_%1_CMD.iec104cmd.xml").arg(iec104.module_name.contains("EDC",Qt::CaseInsensitive) ? "EDC" : "ST"));
+        if(iec104.module_name.contains("EDC",Qt::CaseInsensitive))
+        {
+            edc_count++;
+            filename_arg = edc_count <= 1 ? "EDC" : QString("EDC_%1").arg(edc_count);
+        }
+        else
+        {
+            st_count++;
+            filename_arg = st_count <= 1 ? "ST" : QString("ST_%1").arg(st_count);
+        }
+
+        QFile file_data(dir.path() + "/" + QString("REGUL_IEC104_%1_DATA.iec104data.xml").arg(filename_arg));
+        QFile file_cmd(dir.path() + "/" + QString("REGUL_IEC104_%1_CMD.iec104cmd.xml").arg(filename_arg));
 
         file_data.open(QIODevice::WriteOnly | QIODevice::Text);
         file_cmd.open(QIODevice::WriteOnly | QIODevice::Text);
