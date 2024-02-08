@@ -14,6 +14,7 @@ bool hmi_settings::isValid()
     return (types.size() > 0 && screens.size() > 0);
 }
 
+
 // Получить значение поля in_alias у node
 QString simple_walker::getAlias(pugi::xml_node& node)
 {
@@ -424,6 +425,7 @@ void gen_hmi_nolink_form(QVector<hmi_objects> & obj_vec,  pugi::xml_document & t
     pugi::xml_node link_node = findNodeByAttribute(types_doc,"base-type","NoLink");
 
     int y_cor = 0;
+    int h = QString(findNodeByAttribute(link_node,"target","Height").attribute("value").value()).toInt();
     bool save = false;
 
     for(auto & obj : obj_vec)
@@ -453,7 +455,7 @@ void gen_hmi_nolink_form(QVector<hmi_objects> & obj_vec,  pugi::xml_document & t
              alias_node.first_child().set_value(alias_str.toStdString().data());
         }
 
-        y_cor += 30;
+        y_cor += h;
         save = true;
     }
 
