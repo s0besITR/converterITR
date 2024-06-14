@@ -418,14 +418,28 @@ QVector<template_modbus> MainWindow::parseModbusTemplates(QStringList file_list)
 
     for(auto & t : result_templates)
         for(auto & s : xml_files)
-            if(t.dev_template + ".xml" == s)
+            if(t.dev_template + ".xml" == s) {
                 tmp_vec.push_back(t);
+                break;
+            }
 
     // Если каких-то шаблонов нет, показываем сообщение с их списком
     std::sort(result_templates.begin(), result_templates.end(), cmpModbus);
     std::sort(tmp_vec.begin(), tmp_vec.end(), cmpModbus);
+
     std::vector<template_modbus> difference;
-    std::set_difference(result_templates.begin(), result_templates.end(),tmp_vec.begin(), tmp_vec.end(), std::back_inserter( difference ));
+    for(auto& r : result_templates) {
+        bool found = false;
+        for (auto& t : tmp_vec) {
+            if (r.dev_template == t.dev_template) {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            difference.push_back(r);
+    }
+
     QStringList xml_not_found;
     for(auto t : difference)
         xml_not_found << t.dev_template;
